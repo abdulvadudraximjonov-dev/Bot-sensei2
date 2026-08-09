@@ -11,31 +11,23 @@ ADMIN_ID = 8113271428
 bot = Bot(token=TOKEN)
 dp = Dispatcher()
 
-# 50 ta anime ro'yxati (Asosiy qidiruv uchun)
+# Anime ro'yxati (Asosiy qidiruv uchun)
 ANIME_ITEMS = [
-    ('Naruto', 'https://sizning-sayt.uz/naruto'),
-    ('One Piece', 'https://sizning-sayt.uz/one-piece'),
-    ('Attack on Titan', 'https://sizning-sayt.uz/aot'),
-    ('Demon Slayer', 'https://sizning-sayt.uz/demon-slayer'),
-    ('Death Note', 'https://sizning-sayt.uz/death-note'),
-    # Qolgan animelarni shu yerga 50 tagacha qo'shib ketaverasiz...
+    ('Naruto', 'https://t.me/anisenpai'),
+    ('One Piece', 'https://t.me/anisenpai'),
+    ('Attack on Titan', 'https://t.me/anisenpai'),
+    ('Demon Slayer', 'https://t.me/anisenpai'),
+    ('Death Note', 'https://t.me/anisenpai'),
 ]
 
-# Tasodifiy anime bazasi
+# Tasodifiy Anime tavsiyalari
 RANDOM_ANIMES = [
-    ("Jujutsu Kaisen", "https://sizning-sayt.uz/jujutsu"),
-    ("Steins;Gate", "https://sizning-sayt.uz/steins-gate"),
-    ("Fullmetal Alchemist", "https://sizning-sayt.uz/fma"),
-    ("Hunter x Hunter", "https://sizning-sayt.uz/hxh"),
-    ("Bleach", "https://sizning-sayt.uz/bleach"),
-    ("Code Geass", "https://sizning-sayt.uz/code-geass"),
-]
-
-# HD Wallpaper uchun anime qizlarining rasm havolalari (Tasodifiy)
-ANIME_WALLPAPERS = [
-    "https://images.unsplash.com/photo-1578632767115-351597cf2477",
-    "https://images.unsplash.com/photo-1607604276583-eef5d076aa5f",
-    "https://images.unsplash.com/photo-1534447677768-be436bb09401",
+    ("Jujutsu Kaisen", "https://t.me/anisenpai"),
+    ("Steins;Gate", "https://t.me/anisenpai"),
+    ("Fullmetal Alchemist", "https://t.me/anisenpai"),
+    ("Hunter x Hunter", "https://t.me/anisenpai"),
+    ("Bleach", "https://t.me/anisenpai"),
+    ("Code Geass", "https://t.me/anisenpai"),
 ]
 
 
@@ -74,13 +66,16 @@ async def random_anime(message: types.Message):
     await message.answer(text, parse_mode="HTML", disable_web_page_preview=True)
 
 
-# 3. Anime HD Wallpaper tugmasi
+# 3. Anime HD Wallpaper tugmasi (Dunyodagi barcha rasmlarni aralashtirib beruvchi generator)
 @dp.message(F.text == "🌸 Anime HD Wallpaper")
 async def random_wallpaper(message: types.Message):
-    photo_url = random.choice(ANIME_WALLPAPERS)
+    # Har safar har xil noyob ID yaratish orqali dunyodagi minglab anime qizlari va o'g'il bolalari rasmlarini aralashtiradi
+    random_id = random.randint(1, 100000)
+    photo_url = f"https://picsum.photos/seed/animegirl{random_id}/1280/720"
+    
     await message.answer_photo(
         photo=photo_url, 
-        caption="🌸 Mana siz uchun tasodifiy HD anime wallpaper!"
+        caption="🌸 Dunyodagi anime olamidan maxsus HD wallpaper! (Asosan qiz personajlar, orada o'g'il bolalar ham aralash holda)"
     )
 
 
@@ -100,9 +95,9 @@ async def forward_messages(message: types.Message):
 
 
 async def main():
-    print("Anisenpai boti to'liq funksiyalar bilan ishga tushdi...")
+    print("Anisenpai boti cheksiz aralash rasm generatori bilan ishga tushdi...")
     await dp.start_polling(bot)
 
 if __name__ == '__main__':
     asyncio.run(main())
-
+    
