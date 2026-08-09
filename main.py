@@ -5,12 +5,11 @@ from aiogram.utils.keyboard import ReplyKeyboardBuilder, InlineKeyboardBuilder
 import asyncio
 
 TOKEN = "8542392895:AAHuhuG7Kb0qMdw9cZxHclPkZqxLqu3DuRk"
-ADMIN_ID = 8113271428  # Sizning Admin ID raqamingiz
+ADMIN_ID = 8113271428
 
 bot = Bot(token=TOKEN)
 dp = Dispatcher()
 
-# Barcha foydalanuvchilar bazasi
 users_db = {}
 
 ANIME_ITEMS = [
@@ -29,18 +28,19 @@ RANDOM_ANIMES = [
     ("Demon Slayer", "https://animeaz.org/anime/demon-slayer"),
 ]
 
-BRONZA_WALLPAPERS = [
-    {"name": "Sakura (Naruto)", "photo": "https://images.unsplash.com/photo-1578632767115-351597cf2477"},
-    {"name": "Nobara (Jujutsu Kaisen)", "photo": "https://images.unsplash.com/photo-1607604276583-eef5d076aa5f"},
-    {"name": "Hinata (Naruto)", "photo": "https://images.unsplash.com/photo-1618336753974-aae8e04506aa"},
-    {"name": "Asuna (Sword Art Online)", "photo": "https://images.unsplash.com/photo-1563089145-599997674d42"},
+ANIME_WALLPAPERS = [
+    "https://i.pinimg.com/originals/2b/43/63/2b4363327142df49a46a2a0d7f1bb657.jpg",
+    "https://i.pinimg.com/originals/5c/4b/96/5c4b967814b7e8d5bf3962d2946bb425.jpg",
+    "https://i.pinimg.com/originals/1f/28/73/1f28731051515f4581f1e9444391b15c.jpg",
+    "https://i.pinimg.com/originals/81/75/7f/81757f5c50c0587a8b307bf58c97162b.jpg",
+    "https://i.pinimg.com/originals/3d/16/9c/3d169c82c2e0b1e102657d079d86a422.jpg",
+    "https://i.pinimg.com/originals/f3/7b/72/f37b7255393081e05a8b79bf10e4a773.jpg",
 ]
 
-ANIME_WALLPAPERS = [
-    "https://images.unsplash.com/photo-1578632767115-351597cf2477",
-    "https://images.unsplash.com/photo-1607604276583-eef5d076aa5f",
-    "https://images.unsplash.com/photo-1534447677768-be436bb09401",
-    "https://images.unsplash.com/photo-1618336753974-aae8e04506aa",
+BRONZA_WALLPAPERS = [
+    {"name": "Sakura (Naruto)", "photo": "https://i.pinimg.com/originals/2b/43/63/2b4363327142df49a46a2a0d7f1bb657.jpg"},
+    {"name": "Nobara (Jujutsu Kaisen)", "photo": "https://i.pinimg.com/originals/5c/4b/96/5c4b967814b7e8d5bf3962d2946bb425.jpg"},
+    {"name": "Hinata (Naruto)", "photo": "https://i.pinimg.com/originals/1f/28/73/1f28731051515f4581f1e9444391b15c.jpg"},
 ]
 
 
@@ -60,19 +60,23 @@ async def start_cmd(message: types.Message):
         }
         
         if len(args) > 1:
-            referrer_id = int(args[1])
-            if referrer_id in users_db and referrer_id != user_id:
-                users_db[referrer_id]["refs"] += 1
-                users_db[referrer_id]["points"] += 2  # Har bir do'st uchun 2 ball
-                
-                try:
-                    await bot.send_message(
-                        referrer_id, 
-                        f"🎉 Tabriklaymiz! <b>{user_name}</b> sizning havolangiz orqali qo'shildi.\n"
-                        f"➕ Hisobingizga **2 ball** qo'shildi! Jami ballar: {users_db[referrer_id]['points']}"
-                    )
-                except:
-                    pass
+            try:
+                referrer_id = int(args[1])
+                if referrer_id in users_db and referrer_id != user_id:
+                    users_db[referrer_id]["refs"] += 1
+                    users_db[referrer_id]["points"] += 2
+                    
+                    try:
+                        await bot.send_message(
+                            referrer_id, 
+                            f"🎉 Tabriklaymiz! <b>{user_name}</b> sizning havolangiz orqali qo'shildi.\n"
+                            f"➕ Hisobingizga **2 ball** qo'shildi! Jami ballar: {users_db[referrer_id]['points']}",
+                            parse_mode="HTML"
+                        )
+                    except:
+                        pass
+            except ValueError:
+                pass
 
     builder = ReplyKeyboardBuilder()
     builder.button(text="🔍 Anime qidiruv")
@@ -83,7 +87,6 @@ async def start_cmd(message: types.Message):
     builder.button(text="👥 Referal (2 ball)")
     builder.button(text="🏆 Reyting va Ballar")
     
-    # Faqat SIZGA (Admin uchun) maxsus boshqaruv tugmasi ko'rinadi
     if user_id == ADMIN_ID:
         builder.button(text="👑 Barcha Haremiklar (Admin)")
         
@@ -118,7 +121,7 @@ async def random_anime(message: types.Message):
 @dp.message(F.text == "🌸 Anime HD Wallpaper")
 async def random_wallpaper(message: types.Message):
     photo_url = random.choice(ANIME_WALLPAPERS)
-    await message.answer_photo(photo=photo_url, caption="🌸 Dunyodagi eng sara anime qiz personajlari HD wallpaper!")
+    await message.answer_photo(photo=photo_url)
 
 
 @dp.message(F.text == "👥 Referal (2 ball)")
@@ -128,14 +131,15 @@ async def invite_friends(message: types.Message):
     ref_link = f"https://t.me/{bot_info.username}?start={user_id}"
     user_data = users_db.get(user_id, {"points": 0, "refs": 0})
 
+    # Havola to'g'ridan-to'g'ri matn ostiga yashirildi
     text = (
         f"👥 <b>Do'stlarni taklif qilish va Ball yig'ish:</b>\n\n"
-        f"🔗 Sizning referal havolangiz:\n<code>{ref_link}</code>\n\n"
+        f"🔗 <a href='{ref_link}'>Do'stlarga ulashib, waifu yutib oling</a>\n\n"
         f"📊 Taklif qilingan do'stlar: <b>{user_data['refs']} ta</b>\n"
         f"💎 Sizdagi jami ballar: <b>{user_data['points']} ball</b>\n"
-        f"💡 <i>Har bir do'st uchun 2 ball beriladi!</i>"
+        f"💡 <i>Yuqoridagi yozuvni bosib do'stlaringizga ulashing (Har bir do'st uchun 2 ball beriladi)!</i>"
     )
-    await message.answer(text, parse_mode="HTML")
+    await message.answer(text, parse_mode="HTML", disable_web_page_preview=True)
 
 
 @dp.message(F.text == "🎁 Waifu Tanlash (Bronza)")
@@ -201,7 +205,6 @@ async def leaderboard(message: types.Message):
     await message.answer(text, parse_mode="HTML")
 
 
-# FAQAT SIZ UCHUN (ADMIN PANEL): Barcha foydalanuvchilarning haremi va ma'lumotlarini ko'rish
 @dp.message(F.text == "👑 Barcha Haremiklar (Admin)")
 async def admin_all_harems(message: types.Message):
     if message.from_user.id != ADMIN_ID:
@@ -222,7 +225,6 @@ async def admin_all_harems(message: types.Message):
                     f" ├── 💎 Ballar: {points} | Do'stlar: {refs} ta\n" \
                     f" └ 💖 Haremi: <i>{harem_list}</i>\n\n"
                     
-    # Xabar uzun bo'lib ketganda bo'lib yuborish uchun qulaylik
     if len(text) > 4000:
         for x in range(0, len(text), 4000):
             await message.answer(text[x:x+4000], parse_mode="HTML")
@@ -249,8 +251,9 @@ async def forward_messages(message: types.Message):
 
 
 async def main():
-    print("Anisenpai boti admin boshqaruvi bilan to'liq ishga tushdi...")
+    print("Anisenpai boti yashirin referal havolalari bilan ishga tushdi...")
     await dp.start_polling(bot)
 
 if __name__ == '__main__':
     asyncio.run(main())
+            
