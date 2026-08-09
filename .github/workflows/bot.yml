@@ -1,0 +1,29 @@
+name: Run Telegram Bot
+
+on:
+  push:
+    branches: [ main ]
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Repository'ni yuklab olish
+      uses: actions/checkout@v4
+
+    - name: Python'ni o'rnatish
+      uses: actions/setup-python@v5
+      with:
+        python-version: '3.11'
+
+    - name: Kutubxonalarni o'rnatish
+      run: |
+        pip install --upgrade pip
+        pip install aiogram==3.17.0
+
+    - name: Botni ishga tushirish
+      run: |
+        python main.py
+        
